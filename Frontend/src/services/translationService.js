@@ -10,6 +10,31 @@ const api = axios.create({
   },
 });
 
+// Translation API function
+export const translateText = async (text, targetLang) => {
+  try {
+    // Using MyMemory Translation API (Free, no API key required)
+    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|${targetLang}`;
+    
+    const response = await axios.get(url, {
+      timeout: 10000 // 10 second timeout
+    });
+
+    // Check if translation exists in response
+    if (response.data && response.data.responseData && response.data.responseData.translatedText) {
+      return response.data.responseData.translatedText;
+    }
+    
+    // Fallback if no translation in response
+    return text;
+    
+  } catch (error) {
+    console.error(`Translation API error for ${targetLang}:`, error.message);
+    // Return original text as fallback
+    return text;
+  }
+};
+
 export const addTranslation = async (key, englishText) => {
   try {
     const response = await api.post('/add', { key, englishText });
